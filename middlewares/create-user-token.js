@@ -13,7 +13,7 @@ const createUserToken = async(user, req, res) => {
     res.status(200).json({
         message: "Você está aultenticado",
         token: token,
-        userId: user._id
+        user: user.username
     })
 
 }

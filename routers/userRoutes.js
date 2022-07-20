@@ -1,5 +1,6 @@
 const User = require("../models/User")
 const Guild = require("../models/Guild")
+const Post = require("../models/Post")
 
 const router = require("express").Router()
 const mongoose = require("mongoose")
@@ -241,6 +242,23 @@ router.get("/search", async(req, res) => { // SEARCH A USER
     const users = await User.find({username: new RegExp(q, "i")}).exec()
 
     res.status(200).json(users)
+
+})
+
+router.get("/:username", verifyToken, async(req, res) => { //USER PROFILE
+    const {username} = req.params
+
+    // get user by Id
+    const user = await User.findOne({username: username})
+
+    // get all posts of user
+    const posts = await Post.findOne({userName: username})
+
+    if(!user){
+        return res.status(404).json({error: "Usuário não encontrado!"})
+    }
+
+    res.status(200).json({user, posts})
 
 })
 

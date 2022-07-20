@@ -33,6 +33,8 @@ router.post("/create", verifyToken, imageUpload.single("guildPhoto"), async(req,
         return res.status(422).json({error: "O nome da guilda é obrigatorio."})
     } else if (guilds){
         return res.status(422).json({error: "Esse nome de guilda já existe, por favor escolha outro!"})
+    } else if (user.score < 100){
+        return res.status(422).json({error: "Para criar uma guilda a pontuação miníma é de 100"})
     }
     
     try {
