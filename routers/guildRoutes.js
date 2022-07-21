@@ -213,4 +213,18 @@ router.get("/", async(req, res) => { // GET ALL GUILDS
 
 })
 
+router.get("/:id", async(req, res) => { //GET A GUILD
+
+    const {id} = req.params
+
+    // get a guild by id
+    const guild = await Guild.findById(mongoose.Types.ObjectId(id))
+
+    if(!guild){
+        return res.status(404).json({error: "Guilda não encontrada"})
+    }
+
+    res.status(200).json(guild)
+})
+
 module.exports = router

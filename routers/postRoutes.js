@@ -179,6 +179,20 @@ router.get("/", async(req, res) => { // GET ALL POSTS
 
 })
 
+router.get("/:id", verifyToken, async(req, res) => { // GET POST BY ID   
+
+    const {id} = req.params
+
+    const post = await Post.findById(mongoose.Types.ObjectId(id))
+
+    if(!post){
+        return res.status(404).json({error: "Post não encontrado!"})
+    }
+    
+    res.status(200).json(post)
+
+})
+
 router.get("/search", async(req, res) => { // SEARCH POSTS
 
     const {q} = req.query
