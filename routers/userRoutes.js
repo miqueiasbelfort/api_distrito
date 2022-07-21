@@ -95,7 +95,7 @@ router.post("/login", async(req, res) => { // LOGIN A USER
 router.patch("/edit", verifyToken, imageUpload.single("userPhoto"), async(req, res) => { // EDIT USER
 
 
-    const {username, password, confirPassword, bio, link} = req.body
+    const {username, bio, link} = req.body
 
     // check if user exist by token and get user
     const token = getToken(req)
@@ -108,26 +108,8 @@ router.patch("/edit", verifyToken, imageUpload.single("userPhoto"), async(req, r
     if(!username){
         return res.status(422).json({error: "Nome de usuário é obrigatorio!"})
     } 
-    user.username = username.toLowerCase()
-
-    if (!password){
-        return res.status(422).json({error: "A senha é obrigatoria!"})
-    } 
-
-    if (!confirPassword){
-        return res.status(422).json({error: "Por favor confirme a sua senha!"})
-    } 
     
-    if (password !== confirPassword) {
-        return res.status(422).json({error: "As senhas são diferentes!"})
-    } else if (password === confirPassword && password != null){
-        
-        // create hash
-        const salt = await bcrypt.genSalt(12)
-        const passwordHash = await bcrypt.hash(password, salt)
-        user.password = passwordHash
-    }
-    
+    user.username = username.toLowerCase()    
     user.bio = bio
     user.link = link
 
@@ -146,6 +128,17 @@ router.patch("/edit", verifyToken, imageUpload.single("userPhoto"), async(req, r
     }
 
 
+})
+
+router.get("/", verifyToken, async(req, res) => {   // GET A USER BY TOKEN FOR EDIT
+    // get user by token
+    const token = geToken(req)
+    const user = await getUserByToken(token)
+
+    if(!user){
+        return res.status(404).json({error: "Usuário não encontrado!"})
+    }
+    res.status(200).json(user)
 })
 
 router.put("/:username/follow", verifyToken, async(req, res) => { //FOLLOW AND UNFOLLOW A USER
