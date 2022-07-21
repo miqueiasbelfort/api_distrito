@@ -132,7 +132,7 @@ router.patch("/edit", verifyToken, imageUpload.single("userPhoto"), async(req, r
 
 router.get("/", verifyToken, async(req, res) => {   // GET A USER BY TOKEN FOR EDIT
     // get user by token
-    const token = geToken(req)
+    const token = getToken(req)
     const user = await getUserByToken(token)
 
     if(!user){
