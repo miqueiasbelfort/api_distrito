@@ -31,6 +31,9 @@ const guildSchema = new Schema({
     },
     guildPhoto: {
         type: String
+    },
+    permissionToEnter:{
+        type: Array
     }
 },
 {

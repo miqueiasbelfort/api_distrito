@@ -255,4 +255,31 @@ router.get("/:username", verifyToken, async(req, res) => { //USER PROFILE
 
 })
 
+router.patch("/permission/:guildId", verifyToken, async(req, res) => {
+
+    const {guildId} = req.params
+
+    const token = getToken(req)
+    const user = await getUserByToken(token)
+
+    // get guild by id
+    const guild = await Guild.findById(mongoose.Types.ObjectId(guildId))
+
+    if(user.username === guild.userName) {
+        return res.status(422).json({error: "Você já é Guild Master dessa guilda!"})
+    }
+
+    try {
+
+        guild.permissionToEnter.push(user.username)
+        guild.save()
+
+        res.status(200).json({message: `Você pediu para entrar na guilda ${guild.guildname}`})
+
+    }catch(err){
+        res.status(500).json(err)
+    }
+
+})
+
 module.exports = router

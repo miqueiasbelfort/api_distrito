@@ -44,6 +44,9 @@ const userSchema = new Schema({
     guildPhoto: {
         type: String
     },
+    guildLink: {
+        type: String
+    },
     isGuildAdmin: {
         type: Boolean,
         default: false

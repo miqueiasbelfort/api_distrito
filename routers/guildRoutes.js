@@ -1,5 +1,6 @@
 const Guild = require("../models/Guild")
 const User = require("../models/User")
+const GuildUsers = require("../models/GuildUsers")
 
 const router = require("express").Router()
 
@@ -98,32 +99,24 @@ router.patch("/edit/:id", verifyToken, async(req, res) => { // EDIT THE GUILD
 
 })
 
-router.patch("/addmembers/:guildId/user/:userId", verifyToken, async(req, res) => { // ADD MEMBERS IN GUILD
+router.post("/permission/:username/guild/:guildId", verifyToken, async(req, res) => { // ADD MEMBERS IN GUILD
 
-    const {guildId, userId} = req.params
+    const { username, guildId } = req.params
 
-    // get user by token
-    const token = getToken(req)
-    const user = await getUserByToken(token)
-
-    // get the guild
+    const user = await User.findOne({username})
     const guild = await Guild.findById(mongoose.Types.ObjectId(guildId))
-    const userAdd = await User.findById(mongoose.Types.ObjectId(userId))
-
-    if(user.username !== guild.userName){
-        return res.status(422).json({error: "Você não tem permisão para adicionar membros!"})
-    }
 
     try {
 
-        if(guild.members.includes(userAdd.username)){
-            return res.status(422).json({error: `O usuário ${userAdd.username} já está na sua guilda!`})
-        }
+        const UserInGuild = await GuildUsers.create({
+            guildName: guild.guildname,
+            Username: user.username,
+            UserPhoto: user.userPhoto,
+            userScore: user.score,
+            isGuildUser: true
+        })
 
-        userAdd.guildsMembersNotifications.push(guild._id)
-        userAdd.save()
-
-        res.status(200).json({message: `O pedido para entrar na guilda foi mandado para ${userAdd.username}!`})
+        res.status(200).json({message: `O usuário ${user.username} é o novo membro da guilda ${guild.guildname}`})
 
     } catch(err) {
         res.status(500).json(err)
@@ -225,6 +218,20 @@ router.get("/:id", async(req, res) => { //GET A GUILD
     }
 
     res.status(200).json(guild)
+})
+
+router.get("/members/:guildId", verifyToken, async(req, res) => { // GET ALL MEMBERS OF GUILD
+
+    const {guildId} = req.params
+
+    const userInGuild = await GuildUsers.findOne({guildId})
+
+    if(!userInGuild){
+        return res.status(422).json({error: "Essa guilda não existe!"})
+    }
+
+    res.status(200).json([userInGuild])
+
 })
 
 module.exports = router
