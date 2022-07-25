@@ -242,7 +242,7 @@ router.get("/:username", verifyToken, async(req, res) => { //USER PROFILE
     const {username} = req.params
 
     // get user by Id
-    const user = await User.findOne({username: username})
+    const user = await User.findOne({username: username}).select("-password")
 
     // get all posts of user
     const posts = await Post.findOne({userName: username})

@@ -8,6 +8,7 @@ const guildUsersSchema = new Schema({
     UserPhoto: String,
     userScore: Number,
     isGuildUser: Boolean,
+    isGuildMaster: Boolean,
 },
 {
     timestamps: true

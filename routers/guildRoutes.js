@@ -49,6 +49,19 @@ router.post("/create", verifyToken, imageUpload.single("guildPhoto"), async(req,
             guildPhoto: image
         })
 
+        const UserInGuild = await GuildUsers.create({
+            guildName: guildname,
+            Username: user.username,
+            UserPhoto: user.userPhoto,
+            userScore: user.score,
+            isGuildUser: true,
+            isGuildMaster: true,
+        })
+
+        user.guild = guildname
+        user.guildPhoto = image
+        user.save()
+
         res.status(200).json(newGuild)
 
     } catch(err) {
@@ -99,6 +112,34 @@ router.patch("/edit/:id", verifyToken, async(req, res) => { // EDIT THE GUILD
 
 })
 
+router.patch("/permission/:guildId", verifyToken, async(req, res) => {
+
+    // get user by token
+    const token = getToken(req)
+    const user = await getUserByToken(token)
+
+    const guild = await Guild.findById(mongoose.Types.ObjectId(guildId))
+
+    if(!guild){
+        return res.status(404).json({error: "Guilda não encontrada!"})
+    }
+
+    try {
+
+        guild.permissionToEnter = user.username
+        guild.save()
+
+        res.status(200).json({message: `O usuário ${user.username} pede permisão para entrar na guilda ${guild.guildname}`})
+
+
+    }catch(err){
+
+        res.status(500).json(err)
+
+    }
+
+})
+
 router.post("/permission/:username/guild/:guildId", verifyToken, async(req, res) => { // ADD MEMBERS IN GUILD
 
     const { username, guildId } = req.params
@@ -113,9 +154,10 @@ router.post("/permission/:username/guild/:guildId", verifyToken, async(req, res)
             Username: user.username,
             UserPhoto: user.userPhoto,
             userScore: user.score,
-            isGuildUser: true
+            isGuildUser: true,
+            isGuildMaster: false,
         })
-
+        
         user.guild = guild.guildname
         user.guildPhoto = guild.guildPhoto
         user.save()
@@ -210,12 +252,12 @@ router.get("/", async(req, res) => { // GET ALL GUILDS
 
 })
 
-router.get("/:id", async(req, res) => { //GET A GUILD
+router.get("/:guildname", async(req, res) => { //GET A GUILD
 
-    const {id} = req.params
+    const {guildname} = req.params
 
     // get a guild by id
-    const guild = await Guild.findById(mongoose.Types.ObjectId(id))
+    const guild = await Guild.findOne({guildname})
 
     if(!guild){
         return res.status(404).json({error: "Guilda não encontrada"})
@@ -224,11 +266,11 @@ router.get("/:id", async(req, res) => { //GET A GUILD
     res.status(200).json(guild)
 })
 
-router.get("/members/:guildId", verifyToken, async(req, res) => { // GET ALL MEMBERS OF GUILD
+router.get("/members/:guildname", verifyToken, async(req, res) => { // GET ALL MEMBERS OF GUILD
 
-    const {guildId} = req.params
+    const {guildname} = req.params
 
-    const userInGuild = await GuildUsers.find({guildId})
+    const userInGuild = await GuildUsers.find({guildname})
 
     if(!userInGuild){
         return res.status(422).json({error: "Essa guilda não existe!"})
