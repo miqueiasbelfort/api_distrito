@@ -116,6 +116,10 @@ router.post("/permission/:username/guild/:guildId", verifyToken, async(req, res)
             isGuildUser: true
         })
 
+        user.guild = guild.guildname
+        user.guildPhoto = guild.guildPhoto
+        user.save()
+
         res.status(200).json({message: `O usuário ${user.username} é o novo membro da guilda ${guild.guildname}`})
 
     } catch(err) {
@@ -224,13 +228,13 @@ router.get("/members/:guildId", verifyToken, async(req, res) => { // GET ALL MEM
 
     const {guildId} = req.params
 
-    const userInGuild = await GuildUsers.findOne({guildId})
+    const userInGuild = await GuildUsers.find({guildId})
 
     if(!userInGuild){
         return res.status(422).json({error: "Essa guilda não existe!"})
     }
 
-    res.status(200).json([userInGuild])
+    res.status(200).json(userInGuild)
 
 })
 
