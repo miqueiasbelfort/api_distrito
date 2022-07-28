@@ -15,7 +15,7 @@ const {imageUpload} = require("../middlewares/image-upload")
 
 router.post("/create", verifyToken, imageUpload.single("guildPhoto"), async(req, res) => { // CREATE A NEW GUILD
 
-    const {guildname, warcry, description} = req.body
+    const {guildname, warcry, description, link} = req.body
     let image;
     
     const guilds = await Guild.findOne({guildname})
@@ -23,6 +23,9 @@ router.post("/create", verifyToken, imageUpload.single("guildPhoto"), async(req,
     // get user by token
     const token = getToken(req)
     const user = await getUserByToken(token)
+
+    //the user has a guild
+    const userInGuilds = await GuildUsers.findOne({Username: user.username})
 
     if(req.file){
         image = req.file.filename
@@ -39,6 +42,15 @@ router.post("/create", verifyToken, imageUpload.single("guildPhoto"), async(req,
     }
     
     try {
+
+        if (userInGuilds){
+            return res.status(422).json({error: "Você já tem uma guilda não pode criar outra!"})
+        } else {
+            user.guild = guildname
+            user.guildPhoto = image
+            user.save()
+        }
+
         // Create a new guild
         const newGuild = await Guild.create({
             guildname,
@@ -46,6 +58,7 @@ router.post("/create", verifyToken, imageUpload.single("guildPhoto"), async(req,
             photoUser: user.userPhoto,
             warcry,
             description,
+            link,
             guildPhoto: image
         })
 
@@ -57,10 +70,6 @@ router.post("/create", verifyToken, imageUpload.single("guildPhoto"), async(req,
             isGuildUser: true,
             isGuildMaster: true,
         })
-
-        user.guild = guildname
-        user.guildPhoto = image
-        user.save()
 
         res.status(200).json(newGuild)
 

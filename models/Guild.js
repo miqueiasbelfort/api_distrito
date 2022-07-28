@@ -14,9 +14,6 @@ const guildSchema = new Schema({
     photoUser: {
         type: String
     },
-    members: {
-        type: Array
-    },
     score: {
         type: Number,
         default: 0
@@ -30,6 +27,9 @@ const guildSchema = new Schema({
         max: 500
     },
     guildPhoto: {
+        type: String
+    },
+    link: {
         type: String
     },
     permissionToEnter:{

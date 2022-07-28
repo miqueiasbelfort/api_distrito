@@ -19,7 +19,6 @@ const userSchema = new Schema({
         required: true
     },
     userPhoto: String,
-    party: String,
     followers: {
         type: Array,
         default: []
@@ -46,10 +45,6 @@ const userSchema = new Schema({
     },
     guildLink: {
         type: String
-    },
-    isGuildAdmin: {
-        type: Boolean,
-        default: false
     },
     score: {
         type: Number,
