@@ -123,6 +123,8 @@ router.patch("/edit/:id", verifyToken, async(req, res) => { // EDIT THE GUILD
 
 router.patch("/permission/:guildId", verifyToken, async(req, res) => {
 
+    const {guildId} = req.params
+
     // get user by token
     const token = getToken(req)
     const user = await getUserByToken(token)
