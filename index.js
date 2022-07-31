@@ -23,6 +23,7 @@ require("./config/conn")
 app.use("/api/users", require("./routers/userRoutes"))
 app.use("/api/guilds", require("./routers/guildRoutes"))
 app.use("/api/posts", require("./routers/postRoutes"))
+app.use("/api/challenge", require("./routers/challengeRoutes"))
 
 app.listen(process.env.PORT, () => {
     console.log("Backend is runnig!")
