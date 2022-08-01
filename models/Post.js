@@ -9,6 +9,9 @@ const postSchema = new Schema({
     postPhoto: {
         type: String
     },
+    link: {
+        type: String
+    },
     likes: {
         type: Array
     },
@@ -22,6 +25,18 @@ const postSchema = new Schema({
         type: String
     },
     photoUser: {
+        type: String
+    },
+    challenge: {
+        type: String
+    },
+    challengeId: {
+        type: String
+    },
+    guildChallenge: {
+        type: String
+    },
+    imageGuildChallenge: {
         type: String
     }
 },

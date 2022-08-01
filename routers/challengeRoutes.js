@@ -144,4 +144,26 @@ router.get("/", verifyToken, async(req, res) => { //GET ALL CHALLENGES
 
 })
 
+router.get("/guild/:id", verifyToken, async(req, res) => { //GET ALL CHALLENGES OF A GUILD
+
+    const {id} = req.params
+
+    // get user by token
+    const token = getToken(req)
+    const user = await getUserByToken(token)
+
+    // get guild by id params
+    const guild = await Guild.findById(mongoose.Types.ObjectId(id))
+
+    if(!guild){
+        return res.status(404).json({error: "Guilda não encontrada!"})
+    }
+
+    // get challenges by guild name
+    const challenges = await Challenges.find({guildName: guild.guildname})
+
+    res.status(200).json(challenges)
+
+})
+
 module.exports = router

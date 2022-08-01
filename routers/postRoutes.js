@@ -1,6 +1,7 @@
 const Guild = require("../models/Guild")
 const User = require("../models/User")
 const Post = require("../models/Post")
+const Challenges = require("../models/Challenge")
 
 const router = require("express").Router()
 
@@ -12,9 +13,11 @@ const getUserByToken = require("../middlewares/get-user-by-token")
 const verifyToken = require("../middlewares/verify-token")
 const {imageUpload} = require("../middlewares/image-upload")
 
-router.post("/create", verifyToken, imageUpload.single("postPhoto"), async(req, res) => { // CREATE A NEW POST
+router.post("/create/:idChallenge", verifyToken, imageUpload.single("postPhoto"), async(req, res) => { // CREATE A NEW POST
 
-    const {text} = req.body
+    const {idChallenge} = req.params
+
+    const {text, link} = req.body
     let postPhoto;
 
     if(req.file){
@@ -25,6 +28,9 @@ router.post("/create", verifyToken, imageUpload.single("postPhoto"), async(req, 
     const token = getToken(req)
     const user = await getUserByToken(token)
 
+    // get challenge by id
+    const challenge = await Challenges.findById(mongoose.Types.ObjectId(idChallenge))
+
     if(!text || !req.file) {
         return res.status(422).json({error: "Por favor, adicione uma foto ou um texto para postar!"})
     }
@@ -33,10 +39,15 @@ router.post("/create", verifyToken, imageUpload.single("postPhoto"), async(req, 
 
         const newPost = await Post.create({
             text,
+            link,
             postPhoto,
             userName: user.username,
             userId: user._id,
-            photoUser: user.userPhoto
+            photoUser: user.userPhoto,
+            challenge: challenge.title,
+            challengeId: challenge._id,
+            guildChallenge: challenge.guildName,
+            imageGuildChallenge: challenge.guildPhoto
         })
 
         res.status(200).json(newPost)
