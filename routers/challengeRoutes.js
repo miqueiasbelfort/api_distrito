@@ -144,6 +144,21 @@ router.get("/", verifyToken, async(req, res) => { //GET ALL CHALLENGES
 
 })
 
+router.get("/:id", verifyToken, async(req, res) => { // GET A CHALLENGE
+
+    const {id} = req.params
+
+    // get challenge by id
+    const challenge = await Challenges.findById(mongoose.Types.ObjectId(id))
+
+    if(!challenge){
+        return res.status(404).json({error: "Desafio não encontrado!"})
+    }
+
+    res.status(200).json(challenge)
+
+})
+
 router.get("/guild/:id", verifyToken, async(req, res) => { //GET ALL CHALLENGES OF A GUILD
 
     const {id} = req.params

@@ -18,10 +18,10 @@ router.post("/create/:idChallenge", verifyToken, imageUpload.single("postPhoto")
     const {idChallenge} = req.params
 
     const {text, link} = req.body
-    let postPhoto;
+    let image;
 
     if(req.file){
-        postPhoto = req.file.filename
+        image = req.file.filename
     }
 
     // get user by token
@@ -31,8 +31,8 @@ router.post("/create/:idChallenge", verifyToken, imageUpload.single("postPhoto")
     // get challenge by id
     const challenge = await Challenges.findById(mongoose.Types.ObjectId(idChallenge))
 
-    if(!text || !req.file) {
-        return res.status(422).json({error: "Por favor, adicione uma foto ou um texto para postar!"})
+    if(!text) {
+        return res.status(422).json({error: "Por favor, adicione um texto para postar!"})
     }
 
     try {
@@ -40,7 +40,7 @@ router.post("/create/:idChallenge", verifyToken, imageUpload.single("postPhoto")
         const newPost = await Post.create({
             text,
             link,
-            postPhoto,
+            postPhoto: image,
             userName: user.username,
             userId: user._id,
             photoUser: user.userPhoto,
