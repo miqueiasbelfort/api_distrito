@@ -105,6 +105,9 @@ router.patch("/edit", verifyToken, imageUpload.single("userPhoto"), async(req, r
     // get user of guilds by username
     const userGuilds = await GuildUsers.findOne({Username: user.username})
 
+    // get guild by userName
+    const guild = await Guild.findOne({userName: user.username})
+
     if(req.file) {
         user.userPhoto = req.file.filename
     }
@@ -121,8 +124,19 @@ router.patch("/edit", verifyToken, imageUpload.single("userPhoto"), async(req, r
 
         if(userGuilds){
             userGuilds.Username = username
+            if(req.file){
+                userGuilds.UserPhoto = req.file.filename
+            }
             userGuilds.save()
         }
+        if(guild){
+            guild.userName = username
+            if(req.file){
+                guild.photoUser = req.file.filename
+            }
+            guild.save()
+        }
+
         const updatedUser = await User.findOneAndUpdate(
             {_id: user._id},
             {$set: user},

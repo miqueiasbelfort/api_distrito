@@ -273,7 +273,7 @@ router.delete("/remove/:id", verifyToken, async(req, res) => { // DELETE A GUILD
 
 })
 
-router.get("/search", async(req, res) => { // SEARCH A GUILD
+router.get("/search", verifyToken, async(req, res) => { // SEARCH A GUILD
 
     const {q} = req.query
 
@@ -284,9 +284,17 @@ router.get("/search", async(req, res) => { // SEARCH A GUILD
 
 })
 
-router.get("/", async(req, res) => { // GET ALL GUILDS
+router.get("/", verifyToken, async(req, res) => { // GET ALL GUILDS
 
     const guilds = await Guild.find({})
+
+    res.status(200).json(guilds)
+
+})
+router.get("/rank", verifyToken, async(req, res) => { //GET THREE GUILDS WITH A LARGE SCORE
+
+    // get all guilds
+    const guilds = await Guild.find({}).sort([["score", -1]]).limit(3)
 
     res.status(200).json(guilds)
 
@@ -310,7 +318,7 @@ router.get("/members/:guildname", verifyToken, async(req, res) => { // GET ALL M
 
     const {guildname} = req.params
 
-    const userInGuild = await GuildUsers.find({guildname})
+    const userInGuild = await GuildUsers.find({guildName: guildname})
 
     if(!userInGuild){
         return res.status(422).json({error: "Essa guilda não existe!"})
