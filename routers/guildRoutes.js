@@ -121,7 +121,7 @@ router.patch("/edit/:id", verifyToken, async(req, res) => { // EDIT THE GUILD
 
 })
 
-router.patch("/permission/:guildId", verifyToken, async(req, res) => {
+router.patch("/permission/:guildId", verifyToken, async(req, res) => { // THE USER WANT TO ENTER
 
     const {guildId} = req.params
 
@@ -150,6 +150,30 @@ router.patch("/permission/:guildId", verifyToken, async(req, res) => {
     }
 
 })
+router.patch("/permission/refuse/:guildId/user/:username", verifyToken, async(req, res) => { //GUILD DON'T AUTHORIZED THE USER
+
+    const {guildId, username} = req.params
+
+    // get user by id
+    //const user = await User.findOne({username})
+
+    const guild = await Guild.findById(mongoose.Types.ObjectId(guildId))
+
+    if(!guild){
+        return res.status(404).json({error: "Guilda não encontrada!"})
+    }
+
+    try{
+
+        await guild.updateOne({ $pull: { permissionToEnter:  username}})
+
+        res.status(200).json({message: "Você recusou o perdido de " + username})
+
+    }catch(err){
+        res.status(500).json(err)
+    }
+
+})
 
 router.post("/permission/:username/guild/:guildId", verifyToken, async(req, res) => { // ADD MEMBERS IN GUILD
 
@@ -168,10 +192,15 @@ router.post("/permission/:username/guild/:guildId", verifyToken, async(req, res)
             isGuildUser: true,
             isGuildMaster: false,
         })
+
+        guild.score = guild.score + user.score
         
         user.guild = guild.guildname
         user.guildPhoto = guild.guildPhoto
+
+
         user.save()
+        guild.save()
 
         res.status(200).json({message: `O usuário ${user.username} é o novo membro da guilda ${guild.guildname}`})
 

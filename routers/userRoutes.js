@@ -1,6 +1,7 @@
 const User = require("../models/User")
 const Guild = require("../models/Guild")
 const Post = require("../models/Post")
+const GuildUsers = require("../models/GuildUsers")
 
 const router = require("express").Router()
 const mongoose = require("mongoose")
@@ -101,6 +102,9 @@ router.patch("/edit", verifyToken, imageUpload.single("userPhoto"), async(req, r
     const token = getToken(req)
     const user = await getUserByToken(token)
 
+    // get user of guilds by username
+    const userGuilds = await GuildUsers.findOne({Username: user.username})
+
     if(req.file) {
         user.userPhoto = req.file.filename
     }
@@ -115,6 +119,10 @@ router.patch("/edit", verifyToken, imageUpload.single("userPhoto"), async(req, r
 
     try {
 
+        if(userGuilds){
+            userGuilds.Username = username
+            userGuilds.save()
+        }
         const updatedUser = await User.findOneAndUpdate(
             {_id: user._id},
             {$set: user},
@@ -245,7 +253,7 @@ router.get("/:username", verifyToken, async(req, res) => { //USER PROFILE
     const user = await User.findOne({username: username}).select("-password")
 
     // get all posts of user
-    const posts = await Post.findOne({userName: username})
+    const posts = await Post.find({userName: username})
 
     if(!user){
         return res.status(404).json({error: "Usuário não encontrado!"})

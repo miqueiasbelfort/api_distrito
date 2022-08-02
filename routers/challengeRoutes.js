@@ -47,12 +47,10 @@ router.post("/create/:guildId", verifyToken, async(req, res) => { //CREATEA A CH
         const newChallenge = await Challenges.create({
             guildName: guild.guildname,
             guildPhoto: guild.guildPhoto,
-            guildScore: guild.score,
             title,
             desc,
             score,
             link,
-            isActive: true
         })
 
         res.status(200).json({message: "Novo desafio criado!"})

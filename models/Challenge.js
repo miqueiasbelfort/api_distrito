@@ -8,9 +8,6 @@ const challengeSchema = new Schema({
     guildPhoto: {
         type: String
     },
-    guildScore: {
-        type: Number
-    },
     title: {
         type: String,
         max: 220
@@ -25,9 +22,6 @@ const challengeSchema = new Schema({
     link: {
         type: String,
         max: 220
-    },
-    isActive: {
-        type: Boolean
     }
 },{
     timestamps: true
