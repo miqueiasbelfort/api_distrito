@@ -38,6 +38,12 @@ const postSchema = new Schema({
     },
     imageGuildChallenge: {
         type: String
+    },
+    complete: {
+        type: Array
+    },
+    incomplete: {
+        type: Array
     }
 },
 {

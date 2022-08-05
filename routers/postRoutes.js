@@ -214,5 +214,93 @@ router.get("/search", async(req, res) => { // SEARCH POSTS
 
 })
 
+router.patch("/complete/:id", verifyToken, async(req, res) => {
+
+    const {id} = req.params
+
+    const post = await Post.findById(id)
+
+    if(!post){
+        return res.status(404).json("post is not found!")
+    }
+
+    // get user by id
+    const token = getToken(req)
+    const user = await getUserByToken(token)
+
+    try{
+
+        if(post.complete.includes(user._id)){
+
+            await post.updateOne({ $pull: { complete: user._id } })
+            return res.status(200).json("remove complete")
+
+        }
+
+        if(post.incomplete.includes(user._id)){
+
+            await post.updateOne({ $pull: { incomplete: user._id } })
+
+            post.complete.push(user._id)
+            post.save()
+
+            return res.status(200).json("remove incomplete")
+
+        }
+
+        post.complete.push(user._id)
+        post.save()
+
+        res.status(200).json("complete")
+
+    }catch(err){
+        res.status(500).json("Erro in the server")
+    }
+
+})
+
+router.patch("/incomplete/:id", verifyToken, async(req, res) => {
+
+    const {id} = req.params
+
+    const post = await Post.findById(id)
+
+    if(!post){
+        return res.status(404).json("post is not found!")
+    }
+
+    // get user by id
+    const token = getToken(req)
+    const user = await getUserByToken(token)
+
+    try{
+
+        if(post.incomplete.includes(user._id)){
+            await post.updateOne({ $pull: { incomplete: user._id } })
+            return res.status(200).json("remove me on incomplete array")
+        }
+
+        if(post.complete.includes(user._id)){
+
+            await post.updateOne({ $pull: { complete: user._id } })
+
+            post.incomplete.push(user._id)
+            post.save()
+
+            return res.status(200).json("remove complete")
+
+        }
+
+        post.incomplete.push(user._id)
+        post.save()
+
+        res.status(200).json("is incomplete")
+
+    }catch(err){
+        res.status(500).json("Erro in the server")
+    }
+
+})
+
 
 module.exports = router
